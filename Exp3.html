@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SVG Drawing Tool</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 2vh;
+            background: #f4f6f8;
+        }
+
+        h3 {
+            margin-bottom: 10px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        select, input, button {
+            padding: 6px 10px;
+            font-size: 14px;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        svg {
+            width: 96vw;
+            height: 70vh;
+            background: white;
+            border: 2px solid #333;
+            cursor: crosshair;
+        }
+    </style>
+</head>
+<body>
+
+    <h3>Interactive SVG Drawing Tool</h3>
+
+    <div class="toolbar">
+        <select id="shape">
+            <option value="line">Line</option>
+            <option value="rect">Rectangle</option>
+            <option value="circle">Circle</option>
+        </select>
+
+        <input type="color" id="color" value="#000000">
+
+        <button onclick="undo()">Undo</button>
+    </div>
+
+    <svg id="canvas"></svg>
+
+    <script>
+        const svg = document.getElementById("canvas");
+        const shapeSelect = document.getElementById("shape");
+        const colorPicker = document.getElementById("color");
+
+        let startX, startY;
+        let currentShape;
+        let isDrawing = false;
+        let history = [];
+
+        svg.addEventListener("mousedown", (e) => {
+            isDrawing = true;
+            const point = getMousePosition(e);
+            startX = point.x;
+            startY = point.y;
+
+            const shapeType = shapeSelect.value;
+            const color = colorPicker.value;
+
+            if (shapeType === "line") {
+                currentShape = createSVGElement("line", {
+                    x1: startX,
+                    y1: startY,
+                    x2: startX,
+                    y2: startY,
+                    stroke: color,
+                    "stroke-width": 2
+                });
+            }
+
+            if (shapeType === "rect") {
+                currentShape = createSVGElement("rect", {
+                    x: startX,
+                    y: startY,
+                    width: 0,
+                    height: 0,
+                    fill: "none",
+                    stroke: color,
+                    "stroke-width": 2
+                });
+            }
+
+            if (shapeType === "circle") {
+                currentShape = createSVGElement("circle", {
+                    cx: startX,
+                    cy: startY,
+                    r: 0,
+                    fill: "none",
+                    stroke: color,
+                    "stroke-width": 2
+                });
+            }
+
+            svg.appendChild(currentShape);
+        });
+
+        svg.addEventListener("mousemove", (e) => {
+            if (!isDrawing) return;
+
+            const point = getMousePosition(e);
+
+            if (currentShape.tagName === "line") {
+                currentShape.setAttribute("x2", point.x);
+                currentShape.setAttribute("y2", point.y);
+            }
+
+            if (currentShape.tagName === "rect") {
+                currentShape.setAttribute("width", Math.abs(point.x - startX));
+                currentShape.setAttribute("height", Math.abs(point.y - startY));
+                currentShape.setAttribute("x", Math.min(point.x, startX));
+                currentShape.setAttribute("y", Math.min(point.y, startY));
+            }
+
+            if (currentShape.tagName === "circle") {
+                const radius = Math.sqrt(
+                    Math.pow(point.x - startX, 2) +
+                    Math.pow(point.y - startY, 2)
+                );
+                currentShape.setAttribute("r", radius);
+            }
+        });
+
+        svg.addEventListener("mouseup", () => {
+            if (isDrawing) {
+                history.push(currentShape);
+            }
+            isDrawing = false;
+        });
+
+        svg.addEventListener("mouseleave", () => {
+            isDrawing = false;
+        });
+
+        function undo() {
+            const last = history.pop();
+            if (last) {
+                svg.removeChild(last);
+            }
+        }
+
+        function createSVGElement(tag, attrs) {
+            const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+            for (let key in attrs) {
+                el.setAttribute(key, attrs[key]);
+            }
+            return el;
+        }
+
+        function getMousePosition(event) {
+            const rect = svg.getBoundingClientRect();
+            return {
+                x: event.clientX - rect.left,
+                y: event.clientY - rect.top
+            };
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Product Filter</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background-color: #f7f8fa;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 36px;
+      margin-bottom: 30px;
+    }
+
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .filter-row select {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid #cfd6e4;
+      font-size: 15px;
+      width: 220px;
+      background-color: #ffffff;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background-color: #ffffff;
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid #e1e6f0;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .card h2 {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .price {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 16px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      color: #ffffff;
+      text-transform: lowercase;
+    }
+
+    .electronics {
+      background-color: #3b6df6;
+    }
+
+    .clothing {
+      background-color: #9fc1ff;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>Product Filter</h1>
+
+    <div class="filter-row">
+      <label>Filter by:</label>
+      <select id="categoryFilter">
+        <option value="all">All Products</option>
+        <option value="electronics">Electronics</option>
+        <option value="clothing">Clothing</option>
+      </select>
+    </div>
+
+    <div class="product-grid" id="productGrid">
+
+      <div class="card" data-category="electronics">
+        <h2>Wireless Headphones</h2>
+        <p class="price">$129.99</p>
+        <span class="badge electronics">electronics</span>
+      </div>
+
+      <div class="card" data-category="clothing">
+        <h2>Cotton T-Shirt</h2>
+        <p class="price">$24.99</p>
+        <span class="badge clothing">clothing</span>
+      </div>
+
+      <div class="card" data-category="electronics">
+        <h2>Bluetooth Speaker</h2>
+        <p class="price">$89.99</p>
+        <span class="badge electronics">electronics</span>
+      </div>
+
+      <div class="card" data-category="clothing">
+        <h2>Denim Jeans</h2>
+        <p class="price">$59.99</p>
+        <span class="badge clothing">clothing</span>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const filter = document.getElementById("categoryFilter");
+    const cards = document.querySelectorAll(".card");
+
+    filter.addEventListener("change", function () {
+      const selectedCategory = this.value;
+
+      cards.forEach(card => {
+        if (
+          selectedCategory === "all" ||
+          card.dataset.category === selectedCategory
+        ) {
+          card.style.display = "block";
+        } else {
+          card.style.display = "none";
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
